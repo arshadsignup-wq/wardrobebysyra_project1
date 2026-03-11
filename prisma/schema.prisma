@@ -9,7 +9,6 @@ datasource db {
 
 enum OrderStatus {
   NEW_ORDER
-  ADVANCE_PAID
   SENT_TO_TAILOR
   READY
   DISPATCHED

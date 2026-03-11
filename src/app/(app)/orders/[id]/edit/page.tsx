@@ -28,6 +28,7 @@ export default function EditOrderPage({
           deliveryZone: data.deliveryZone || "INSIDE_DHAKA",
           source: data.source || "FACEBOOK",
           notes: data.notes || "",
+          orderDate: data.createdAt ? data.createdAt.slice(0, 10) : "",
         });
         setLoading(false);
       });

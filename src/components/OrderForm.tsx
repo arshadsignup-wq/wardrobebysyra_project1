@@ -18,6 +18,12 @@ interface OrderData {
   deliveryZone: DeliveryZone;
   source: OrderSource;
   notes: string;
+  orderDate: string;
+}
+
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 const defaultData: OrderData = {
@@ -31,6 +37,7 @@ const defaultData: OrderData = {
   deliveryZone: "INSIDE_DHAKA",
   source: "FACEBOOK",
   notes: "",
+  orderDate: todayStr(),
 };
 
 export default function OrderForm({
@@ -43,6 +50,9 @@ export default function OrderForm({
   const router = useRouter();
   const [form, setForm] = useState<OrderData>({ ...defaultData, ...initialData });
   const [loading, setLoading] = useState(false);
+  const [advancePaid, setAdvancePaid] = useState(
+    initialData ? parseInt(String(initialData.advanceAmount || "0")) > 0 : true
+  );
 
   const deliveryCharge = DELIVERY_CHARGES[form.deliveryZone];
   const totalWithDelivery = (parseInt(form.totalPrice) || 0) + deliveryCharge;
@@ -89,8 +99,8 @@ export default function OrderForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-white rounded-xl border border-gray-100 p-4 sm:p-6 shadow-sm">
+        <h3 className="font-display text-lg font-semibold text-gray-900 mb-4">
           Customer Details
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -131,11 +141,24 @@ export default function OrderForm({
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
             />
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Order Date *
+            </label>
+            <input
+              name="orderDate"
+              type="date"
+              value={form.orderDate}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+            />
+          </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-white rounded-xl border border-gray-100 p-4 sm:p-6 shadow-sm">
+        <h3 className="font-display text-lg font-semibold text-gray-900 mb-4">
           Order Details
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -213,8 +236,8 @@ export default function OrderForm({
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Pricing</h3>
+      <div className="bg-white rounded-xl border border-gray-100 p-4 sm:p-6 shadow-sm">
+        <h3 className="font-display text-lg font-semibold text-gray-900 mb-4">Pricing</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -232,16 +255,49 @@ export default function OrderForm({
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Advance (BDT)
+              Advance Payment
             </label>
-            <input
-              name="advanceAmount"
-              type="number"
-              value={form.advanceAmount}
-              onChange={handleChange}
-              min="0"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-            />
+            <div className="flex rounded-lg border border-gray-300 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => {
+                  setAdvancePaid(true);
+                  setForm({ ...form, advanceAmount: "500" });
+                }}
+                className={`flex-1 px-3 py-2 text-sm font-medium transition-colors ${
+                  advancePaid
+                    ? "bg-primary text-white"
+                    : "bg-white text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                Advance Paid
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAdvancePaid(false);
+                  setForm({ ...form, advanceAmount: "0" });
+                }}
+                className={`flex-1 px-3 py-2 text-sm font-medium transition-colors ${
+                  !advancePaid
+                    ? "bg-red-500 text-white"
+                    : "bg-white text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                No Advance
+              </button>
+            </div>
+            {advancePaid && (
+              <input
+                name="advanceAmount"
+                type="number"
+                value={form.advanceAmount}
+                onChange={handleChange}
+                min="0"
+                placeholder="500"
+                className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+              />
+            )}
           </div>
         </div>
 

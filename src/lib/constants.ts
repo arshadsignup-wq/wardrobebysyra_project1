@@ -2,7 +2,6 @@ import type { OrderStatus, OrderSource, DeliveryZone } from "@/lib/types";
 
 export const STATUS_LABELS: Record<OrderStatus, string> = {
   NEW_ORDER: "New Order",
-  ADVANCE_PAID: "Advance Paid",
   SENT_TO_TAILOR: "Sent to Tailor",
   READY: "Ready",
   DISPATCHED: "Dispatched",
@@ -10,17 +9,15 @@ export const STATUS_LABELS: Record<OrderStatus, string> = {
 };
 
 export const STATUS_COLORS: Record<OrderStatus, string> = {
-  NEW_ORDER: "bg-blue-100 text-blue-800",
-  ADVANCE_PAID: "bg-yellow-100 text-yellow-800",
-  SENT_TO_TAILOR: "bg-purple-100 text-purple-800",
-  READY: "bg-green-100 text-green-800",
-  DISPATCHED: "bg-orange-100 text-orange-800",
-  DELIVERED: "bg-emerald-100 text-emerald-800",
+  NEW_ORDER: "bg-sky-50 text-sky-700",
+  SENT_TO_TAILOR: "bg-violet-50 text-violet-700",
+  READY: "bg-emerald-50 text-emerald-700",
+  DISPATCHED: "bg-amber-50 text-amber-700",
+  DELIVERED: "bg-teal-50 text-teal-700",
 };
 
 export const STATUS_FLOW: OrderStatus[] = [
   "NEW_ORDER",
-  "ADVANCE_PAID",
   "SENT_TO_TAILOR",
   "READY",
   "DISPATCHED",
