@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum OrderStatus {
+  NEW_ORDER
+  ADVANCE_PAID
+  SENT_TO_TAILOR
+  READY
+  DISPATCHED
+  DELIVERED
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  orderNumber   Int         @unique @default(autoincrement())
+  customerName  String
+  phone         String
+  address       String
+  imageUrl      String?
+  sizeDetails   String?
+  totalPrice    Int
+  advanceAmount Int         @default(500)
+  codAmount     Int
+  status        OrderStatus @default(NEW_ORDER)
+  notes         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([status])
+  @@index([customerName])
+  @@index([phone])
+}
