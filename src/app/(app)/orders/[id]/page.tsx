@@ -10,6 +10,7 @@ import {
   STATUS_FLOW,
   STATUS_COLORS,
   getNextStatus,
+  SOURCE_LABELS,
 } from "@/lib/constants";
 import { toast } from "@/components/Toast";
 
@@ -177,6 +178,12 @@ export default function OrderDetailPage({
                 {order.address}
               </dd>
             </div>
+            <div>
+              <dt className="text-sm text-gray-500">Source</dt>
+              <dd className="text-sm font-medium text-gray-900">
+                {SOURCE_LABELS[order.source]}
+              </dd>
+            </div>
           </dl>
         </div>
 
@@ -185,15 +192,23 @@ export default function OrderDetailPage({
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Pricing</h3>
           <dl className="space-y-3">
             <div className="flex justify-between">
-              <dt className="text-sm text-gray-500">Total Price</dt>
+              <dt className="text-sm text-gray-500">Product Price</dt>
               <dd className="text-sm font-semibold text-gray-900">
                 ৳{order.totalPrice.toLocaleString()}
               </dd>
             </div>
             <div className="flex justify-between">
+              <dt className="text-sm text-gray-500">
+                Delivery ({order.deliveryZone === "INSIDE_DHAKA" ? "Inside Dhaka" : "Outside Dhaka"})
+              </dt>
+              <dd className="text-sm font-medium text-gray-600">
+                + ৳{order.deliveryCharge}
+              </dd>
+            </div>
+            <div className="flex justify-between">
               <dt className="text-sm text-gray-500">Advance Paid</dt>
               <dd className="text-sm font-medium text-green-600">
-                ৳{order.advanceAmount.toLocaleString()}
+                - ৳{order.advanceAmount.toLocaleString()}
               </dd>
             </div>
             <div className="flex justify-between border-t pt-3">

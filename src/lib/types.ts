@@ -12,6 +12,22 @@ export const OrderStatus = {
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
 
+export const OrderSource = {
+  FACEBOOK: "FACEBOOK",
+  INSTAGRAM: "INSTAGRAM",
+  WHATSAPP: "WHATSAPP",
+  WEBSITE: "WEBSITE",
+} as const;
+
+export type OrderSource = (typeof OrderSource)[keyof typeof OrderSource];
+
+export const DeliveryZone = {
+  INSIDE_DHAKA: "INSIDE_DHAKA",
+  OUTSIDE_DHAKA: "OUTSIDE_DHAKA",
+} as const;
+
+export type DeliveryZone = (typeof DeliveryZone)[keyof typeof DeliveryZone];
+
 export interface Order {
   id: string;
   orderNumber: number;
@@ -22,7 +38,10 @@ export interface Order {
   sizeDetails: string | null;
   totalPrice: number;
   advanceAmount: number;
+  deliveryCharge: number;
+  deliveryZone: DeliveryZone;
   codAmount: number;
+  source: OrderSource;
   status: OrderStatus;
   notes: string | null;
   createdAt: string;

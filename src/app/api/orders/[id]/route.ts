@@ -28,12 +28,18 @@ export async function PATCH(
   if (body.phone !== undefined) data.phone = body.phone;
   if (body.address !== undefined) data.address = body.address;
   if (body.imageUrl !== undefined) data.imageUrl = body.imageUrl || null;
-  if (body.sizeDetails !== undefined)
-    data.sizeDetails = body.sizeDetails || null;
+  if (body.sizeDetails !== undefined) data.sizeDetails = body.sizeDetails || null;
   if (body.notes !== undefined) data.notes = body.notes || null;
   if (body.status !== undefined) data.status = body.status;
+  if (body.source !== undefined) data.source = body.source;
+  if (body.deliveryZone !== undefined) data.deliveryZone = body.deliveryZone;
 
-  if (body.totalPrice !== undefined || body.advanceAmount !== undefined) {
+  // Recalculate COD if any pricing field changes
+  if (
+    body.totalPrice !== undefined ||
+    body.advanceAmount !== undefined ||
+    body.deliveryCharge !== undefined
+  ) {
     const existing = await prisma.order.findUnique({ where: { id } });
     if (!existing) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
@@ -47,10 +53,15 @@ export async function PATCH(
       body.advanceAmount !== undefined
         ? parseInt(body.advanceAmount)
         : existing.advanceAmount;
+    const delivery =
+      body.deliveryCharge !== undefined
+        ? parseInt(body.deliveryCharge)
+        : existing.deliveryCharge;
 
     data.totalPrice = total;
     data.advanceAmount = advance;
-    data.codAmount = total - advance;
+    data.deliveryCharge = delivery;
+    data.codAmount = total + delivery - advance;
   }
 
   const order = await prisma.order.update({

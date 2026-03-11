@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "@/components/Toast";
+import { SOURCE_LABELS, DELIVERY_CHARGES, DELIVERY_ZONE_LABELS } from "@/lib/constants";
+import type { OrderSource, DeliveryZone } from "@/lib/types";
 
 interface OrderData {
   id?: string;
@@ -13,6 +15,8 @@ interface OrderData {
   sizeDetails: string;
   totalPrice: string;
   advanceAmount: string;
+  deliveryZone: DeliveryZone;
+  source: OrderSource;
   notes: string;
 }
 
@@ -24,6 +28,8 @@ const defaultData: OrderData = {
   sizeDetails: "",
   totalPrice: "",
   advanceAmount: "500",
+  deliveryZone: "INSIDE_DHAKA",
+  source: "FACEBOOK",
   notes: "",
 };
 
@@ -38,8 +44,9 @@ export default function OrderForm({
   const [form, setForm] = useState<OrderData>({ ...defaultData, ...initialData });
   const [loading, setLoading] = useState(false);
 
-  const codAmount =
-    (parseInt(form.totalPrice) || 0) - (parseInt(form.advanceAmount) || 0);
+  const deliveryCharge = DELIVERY_CHARGES[form.deliveryZone];
+  const totalWithDelivery = (parseInt(form.totalPrice) || 0) + deliveryCharge;
+  const codAmount = totalWithDelivery - (parseInt(form.advanceAmount) || 0);
 
   useEffect(() => {
     if (initialData) {
@@ -48,7 +55,7 @@ export default function OrderForm({
   }, [initialData]);
 
   function handleChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
@@ -63,7 +70,10 @@ export default function OrderForm({
     const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({
+        ...form,
+        deliveryCharge,
+      }),
     });
 
     if (res.ok) {
@@ -131,6 +141,23 @@ export default function OrderForm({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
+              Source *
+            </label>
+            <select
+              name="source"
+              value={form.source}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary bg-white"
+            >
+              {(Object.keys(SOURCE_LABELS) as OrderSource[]).map((key) => (
+                <option key={key} value={key}>
+                  {SOURCE_LABELS[key]}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Image URL
             </label>
             <input
@@ -153,6 +180,23 @@ export default function OrderForm({
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
             />
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Delivery Zone *
+            </label>
+            <select
+              name="deliveryZone"
+              value={form.deliveryZone}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary bg-white"
+            >
+              {(Object.keys(DELIVERY_ZONE_LABELS) as DeliveryZone[]).map((key) => (
+                <option key={key} value={key}>
+                  {DELIVERY_ZONE_LABELS[key]}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="sm:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Notes
@@ -171,10 +215,10 @@ export default function OrderForm({
 
       <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Pricing</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Total Price (BDT) *
+              Product Price (BDT) *
             </label>
             <input
               name="totalPrice"
@@ -199,12 +243,25 @@ export default function OrderForm({
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              COD Amount (BDT)
-            </label>
-            <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-lg font-semibold text-gray-900">
-              ৳{codAmount >= 0 ? codAmount.toLocaleString() : 0}
+        </div>
+
+        <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between text-gray-600">
+              <span>Product Price</span>
+              <span>৳{(parseInt(form.totalPrice) || 0).toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between text-gray-600">
+              <span>Delivery Charge ({form.deliveryZone === "INSIDE_DHAKA" ? "Inside Dhaka" : "Outside Dhaka"})</span>
+              <span>+ ৳{deliveryCharge}</span>
+            </div>
+            <div className="flex justify-between text-gray-600">
+              <span>Advance Paid</span>
+              <span>- ৳{(parseInt(form.advanceAmount) || 0).toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between border-t border-gray-300 pt-2 text-base font-bold text-gray-900">
+              <span>COD Amount</span>
+              <span className="text-primary">৳{codAmount >= 0 ? codAmount.toLocaleString() : 0}</span>
             </div>
           </div>
         </div>

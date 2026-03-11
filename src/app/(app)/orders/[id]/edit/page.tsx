@@ -25,6 +25,8 @@ export default function EditOrderPage({
           sizeDetails: data.sizeDetails || "",
           totalPrice: String(data.totalPrice),
           advanceAmount: String(data.advanceAmount),
+          deliveryZone: data.deliveryZone || "INSIDE_DHAKA",
+          source: data.source || "FACEBOOK",
           notes: data.notes || "",
         });
         setLoading(false);
@@ -39,9 +41,7 @@ export default function EditOrderPage({
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">
-        Edit Order #{order?.id ? "" : ""}
-      </h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Edit Order</h1>
       {order && <OrderForm initialData={order} isEdit />}
     </div>
   );

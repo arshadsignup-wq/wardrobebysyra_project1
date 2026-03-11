@@ -1,4 +1,4 @@
-import type { OrderStatus } from "@/lib/types";
+import type { OrderStatus, OrderSource, DeliveryZone } from "@/lib/types";
 
 export const STATUS_LABELS: Record<OrderStatus, string> = {
   NEW_ORDER: "New Order",
@@ -32,3 +32,20 @@ export function getNextStatus(current: OrderStatus): OrderStatus | null {
   if (idx === -1 || idx === STATUS_FLOW.length - 1) return null;
   return STATUS_FLOW[idx + 1];
 }
+
+export const SOURCE_LABELS: Record<OrderSource, string> = {
+  FACEBOOK: "Facebook",
+  INSTAGRAM: "Instagram",
+  WHATSAPP: "WhatsApp",
+  WEBSITE: "Website",
+};
+
+export const DELIVERY_CHARGES: Record<DeliveryZone, number> = {
+  INSIDE_DHAKA: 80,
+  OUTSIDE_DHAKA: 130,
+};
+
+export const DELIVERY_ZONE_LABELS: Record<DeliveryZone, string> = {
+  INSIDE_DHAKA: "Inside Dhaka (৳80)",
+  OUTSIDE_DHAKA: "Outside Dhaka (৳130)",
+};

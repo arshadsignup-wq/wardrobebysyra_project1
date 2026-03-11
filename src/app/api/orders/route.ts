@@ -31,6 +31,11 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
+  const totalPrice = parseInt(body.totalPrice);
+  const advanceAmount = parseInt(body.advanceAmount || "500");
+  const deliveryCharge = parseInt(body.deliveryCharge || "80");
+  const codAmount = totalPrice + deliveryCharge - advanceAmount;
+
   const order = await prisma.order.create({
     data: {
       customerName: body.customerName,
@@ -38,10 +43,12 @@ export async function POST(request: NextRequest) {
       address: body.address,
       imageUrl: body.imageUrl || null,
       sizeDetails: body.sizeDetails || null,
-      totalPrice: parseInt(body.totalPrice),
-      advanceAmount: parseInt(body.advanceAmount || "500"),
-      codAmount:
-        parseInt(body.totalPrice) - parseInt(body.advanceAmount || "500"),
+      totalPrice,
+      advanceAmount,
+      deliveryCharge,
+      deliveryZone: body.deliveryZone || "INSIDE_DHAKA",
+      codAmount,
+      source: body.source || "FACEBOOK",
       notes: body.notes || null,
     },
   });
