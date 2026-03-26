@@ -471,13 +471,34 @@ export default function OrderDetailPage({
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">Details</h3>
             <button
-              onClick={() => {
+              onClick={async () => {
                 const firstName = order.customerName.split(" ")[0];
                 const lines: string[] = [];
-                if (order.imageUrl) lines.push(`📸 ${order.imageUrl}`);
                 lines.push(`👤 ${firstName}`);
-                if (order.sizeDetails) lines.push(`📏 ${order.sizeDetails}`);
+                if (order.sizeDetails) {
+                  const size = order.sizeDetails.replace(/\bbust\b/gi, "Body");
+                  lines.push(`📏 ${size}`);
+                }
                 if (order.notes) lines.push(`📝 ${order.notes}`);
+
+                // Try to copy the image directly to clipboard
+                if (order.imageUrl) {
+                  try {
+                    const res = await fetch(order.imageUrl);
+                    const blob = await res.blob();
+                    const textBlob = new Blob([lines.join("\n")], { type: "text/plain" });
+                    await navigator.clipboard.write([
+                      new ClipboardItem({
+                        [blob.type]: blob,
+                        "text/plain": textBlob,
+                      }),
+                    ]);
+                    toast("Copied image + text for Tailor!");
+                    return;
+                  } catch {
+                    // Fallback: copy text only
+                  }
+                }
                 navigator.clipboard.writeText(lines.join("\n"));
                 toast("Copied for Tailor!");
               }}
