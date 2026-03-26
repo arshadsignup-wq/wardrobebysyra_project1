@@ -13,6 +13,7 @@ import {
   SOURCE_LABELS,
 } from "@/lib/constants";
 import { toast } from "@/components/Toast";
+import PathaoModal from "@/components/PathaoModal";
 
 export default function OrderDetailPage({
   params,
@@ -26,6 +27,7 @@ export default function OrderDetailPage({
   const [updating, setUpdating] = useState(false);
   const [sendingRedx, setSendingRedx] = useState(false);
   const [showRedxModal, setShowRedxModal] = useState(false);
+  const [showPathaoModal, setShowPathaoModal] = useState(false);
   const [areaSearch, setAreaSearch] = useState("");
   const [areaResults, setAreaResults] = useState<{ id: number; name: string }[]>([]);
   const [selectedArea, setSelectedArea] = useState<{ id: number; name: string } | null>(null);
@@ -302,12 +304,20 @@ export default function OrderDetailPage({
         </div>
         <div className="flex gap-2 flex-wrap">
           {showRedx && (
-            <button
-              onClick={() => setShowRedxModal(true)}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
-            >
-              Send to RedX
-            </button>
+            <>
+              <button
+                onClick={() => setShowRedxModal(true)}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
+              >
+                Send to RedX
+              </button>
+              <button
+                onClick={() => setShowPathaoModal(true)}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+              >
+                Send to Pathao
+              </button>
+            </>
           )}
           {showPrintSlip && (
             <button
@@ -520,6 +530,18 @@ export default function OrderDetailPage({
           </div>
         )}
       </div>
+
+      {/* Pathao Modal */}
+      {showPathaoModal && order && (
+        <PathaoModal
+          order={order}
+          onClose={() => setShowPathaoModal(false)}
+          onSuccess={(consignmentId) => {
+            toast(`Sent to Pathao! Consignment: ${consignmentId}`);
+            setShowPathaoModal(false);
+          }}
+        />
+      )}
 
       {/* RedX Area Modal */}
       {showRedxModal && order && (
