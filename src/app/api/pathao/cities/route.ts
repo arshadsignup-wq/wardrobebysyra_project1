@@ -19,7 +19,6 @@ export async function GET() {
     return NextResponse.json({ cities: cachedCities });
   } catch (error) {
     console.error("Pathao cities error:", error);
-    const msg = error instanceof Error ? error.message : "Failed to fetch cities";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch cities" }, { status: 500 });
   }
 }
